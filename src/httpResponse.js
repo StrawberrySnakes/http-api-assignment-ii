@@ -6,14 +6,13 @@ const users = {};
 // json helper
 const respondJSON = (request, response, status, object) => {
   const responseJSON = JSON.stringify(object);
-
   response.writeHead(status, {
     'Content-Type': 'application/json',
   });
 
-  // TODO:
-  // Only send body if NOT HEAD request
-
+  if( request.method!= 'HEAD' ) {
+    response.write(respondJSON);
+  }
   response.end();
 };
 
@@ -23,8 +22,7 @@ const getUsers = (request, response) => {
     users,
   };
 
-  // TODO:
-  // Send 200 response
+  return respondJSON(request, response, 200, respondJSON);
 };
 
 // Add users functions
@@ -39,10 +37,34 @@ const addUser = (request, response) => {
     const bodyString = Buffer.concat(body).toString();
     const bodyParams = query.parse(bodyString);
 
-    // TODO:
-    // If name OR age missing → 400
-    // If new user → 201
-    // If existing user → 204
+    if(!bodyParams.name || !bodyParams.age) {
+        const message = {
+            message: "Name and Age are needed",
+            id : "missingParams"
+        };
+        return respondJSON(request, response, 400, message);
+    }
+
+    let statusCode = 201;
+    if(users[bodyParams.name]) {
+        statusCode = 204;
+    }
+
+    users[bodyParams.name] = {
+        name: bodyParams.name,
+        age: bodyParams.age
+    }
+
+    if(statusCode = 201) {
+        const message = {
+            message: 'User created successfully'
+        }
+        return respondJSON(request, response, 201, message);
+    }
+
+    //if updating --> 204
+    response.writeHead(204);
+    return response.end();
   });
 };
 
@@ -53,8 +75,7 @@ const notFound = (request, response) => {
     id: 'notFound',
   };
 
-  // TODO:
-  // Send 404
+  return respondJSON(request, response, 404, message);
 };
 
 module.exports = {

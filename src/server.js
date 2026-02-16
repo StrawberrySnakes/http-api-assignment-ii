@@ -16,14 +16,14 @@ const handleRequest = (request, response) => {
   if (request.method === 'GET' || request.method === 'HEAD') {
 
     if (pathname === '/') {
-      const html = fs.readFileSync(path.join(__dirname, '../client.html'));
+      const html = fs.readFileSync(path.join(__dirname, '../client/client.html'));
       response.writeHead(200, { 'Content-Type': 'text/html' });
       response.write(html);
       return response.end();
     }
 
     if (pathname === '/style.css') {
-      const css = fs.readFileSync(path.join(__dirname, '../style.css'));
+      const css = fs.readFileSync(path.join(__dirname, '../client/style.css'));
       response.writeHead(200, { 'Content-Type': 'text/css' });
       response.write(css);
       return response.end();
