@@ -1,12 +1,12 @@
-//server.js
 const http = require('http');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
 
+// Fix: filename is httpResponses.js (plural)
 const responses = require('./httpResponse.js');
 
-const port = 3000;
+const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 // handler function
 const handleRequest = (request, response) => {

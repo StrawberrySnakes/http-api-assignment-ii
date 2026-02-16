@@ -1,4 +1,3 @@
-//httpResponses.js
 const query = require('querystring');
 
 // In-memory database
@@ -6,13 +5,12 @@ const users = {};
 
 // json helper
 const respondJSON = (request, response, status, object) => {
-  const responseJSON = JSON.stringify(object);
   response.writeHead(status, {
     'Content-Type': 'application/json',
   });
 
-  if( request.method!= 'HEAD' ) {
-    response.write(responseJSON);
+  if( request.method !== 'HEAD' && status !== 204) {
+    response.write(JSON.stringify(object));
   }
   response.end();
 };
@@ -40,13 +38,15 @@ const addUser = (request, response) => {
 
     if(!bodyParams.name || !bodyParams.age) {
         const message = {
-            message: "Name and Age are needed",
+            message: "Name and age are both required.",
             id : "missingParams"
         };
         return respondJSON(request, response, 400, message);
     }
 
     let statusCode = 201;
+    
+    // Check if user exists to switch to update mode
     if(users[bodyParams.name]) {
         statusCode = 204;
     }
@@ -54,17 +54,18 @@ const addUser = (request, response) => {
     users[bodyParams.name] = {
         name: bodyParams.name,
         age: bodyParams.age
-    }
+    };
 
-    if(statusCode == 201) {
+    if(statusCode === 201) {
         const message = {
-            message: 'User created successfully'
-        }
+            message: 'Created Successfully',
+        };
         return respondJSON(request, response, 201, message);
     }
 
     //if updating --> 204
-    response.writeHead(204);
+    // 204 has no content body, so we just write the head and end.
+    response.writeHead(204, { 'Content-Type': 'application/json' });
     return response.end();
   });
 };
