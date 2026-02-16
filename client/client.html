@@ -11,7 +11,7 @@
       const handleResponse = async (response, parseResponse) => {
         const content = document.querySelector('#content');
         
-        // Write the status code first so the user sees what happened
+        // 1. Display the Status Code header (Handled Appropriately)
         switch(response.status) {
           case 200:
             content.innerHTML = `<b>Success</b>`;
@@ -33,16 +33,16 @@
             break;
         }
 
-        // Only parse JSON if allowed
+        //Parse JSON
         if (parseResponse) {
-          const data = await response.json();
-          console.log('Response JSON:', data); 
+          const obj = await response.json();
+          console.log(obj);
 
-          // Display the message if it exists, then the raw JSON
-          /* If the JSON has a 'message' property, we can print it nicely. 
-             Otherwise, just the raw JSON dump as per assignment images. */
-          content.innerHTML += `<p>Message: ${data.message}</p>`;
-          content.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+          if(obj.message) {
+            content.innerHTML += `<p>Message: ${obj.message}</p>`;
+          }
+          
+          content.innerHTML += `<pre>${JSON.stringify(obj, null, 2)}</pre>`;
         } 
       };
 
@@ -50,6 +50,7 @@
 
       const sendRequest = (e) => {
         e.preventDefault();
+        
         const url = document.querySelector('#urlField').value;
         const method = document.querySelector('#methodSelect').value;
 
@@ -59,7 +60,6 @@
                 'Accept': 'application/json'
             }
         }).then((response) => {
-          // If HEAD, we don't parse. If GET, we do.
           const shouldParse = method.toLowerCase() !== 'head';
           return handleResponse(response, shouldParse);
         });
@@ -85,7 +85,7 @@
           body: `name=${name}&age=${age}`,
         })
         .then((response) => {
-          // 204 status means updated, but no content returned. Do not parse.
+          // 204 means updated (no body), so don't parse.
           const shouldParse = response.status !== 204;
           return handleResponse(response, shouldParse);
         });
