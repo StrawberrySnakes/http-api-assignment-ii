@@ -6,63 +6,67 @@
   
   <script>
     // client response code
-    const handleResponse = async (response, parseResponse) => {
-      console.log('Status:', response.status);
 
-      // Only parse JSON if allowed
-      if (parseResponse) {
-        const data = await response.json();
-        console.log('Response JSON:', data); 
+    window.onload = () => {
+      const handleResponse = async (response, parseResponse) => {
+        console.log('Status:', response.status);
 
-        const content = document.querySelector('#content');
-        content.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-      } else {
-        const content = document.querySelector('#content');
-        content.innerHTML = `<p>Status: ${response.status}</p>`;
-      }
+        // Only parse JSON if allowed
+        if (parseResponse) {
+          const data = await response.json();
+          console.log('Response JSON:', data); 
+
+          const content = document.querySelector('#content');
+          content.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } else {
+          const content = document.querySelector('#content');
+          content.innerHTML = `<p>Status: ${response.status}</p>`;
+        }
+      };
+
+      const userForm = document.querySelector('#userForm');
+
+      const sendRequest = (e) => {
+        e.preventDefault();
+        const url = document.querySelector('#urlField').value;
+        const method = document.querySelector('#methodSelect').value;
+
+        fetch(url, { method,}).then((response) => {
+          const shouldParse = method.toLowerCase() !== 'head';
+          return handleResponse(response, shouldParse);
+        });
+
+        return false;
+      };
+
+      userForm.addEventListener('submit', sendRequest);
+      const nameForm = document.querySelector('#nameForm');
+
+      const addUser = (e) => {
+        e.preventDefault();
+
+        const name = document.querySelector('#nameField').value;
+        const age = document.querySelector('#ageField').value;
+
+        fetch('/addUser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `name=${name}&age=${age}`,
+        })
+        .then((response) => {
+          const shouldParse = response.status !== 204;
+          return handleResponse(response, shouldParse);
+        });
+
+        return false;
+      };
+
+      nameForm.addEventListener('submit', addUser);
     };
-
-    const userForm = document.querySelector('#userForm');
-
-    const sendRequest = (e) => {
-      e.preventDefault();
-      const url = document.querySelector('#urlField').value;
-      const method = document.querySelector('#methodSelect').value;
-
-      fetch(url, { method,}).then((response) => {
-        const shouldParse = method.toLowerCase() !== 'head';
-        return handleResponse(response, shouldParse);
-      });
-
-      return false;
-    };
-
-    userForm.addEventListener('submit', sendRequest);
-    const nameForm = document.querySelector('#nameForm');
-
-    const addUser = (e) => {
-      e.preventDefault();
-
-      const name = document.querySelector('#nameField').value;
-      const age = document.querySelector('#ageField').value;
-
-      fetch('/addUser', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `name=${name}&age=${age}`,
-      })
-      .then((response) => {
-        const shouldParse = response.status !== 204;
-        return handleResponse(response, shouldParse);
-      });
-
-      return false;
-    };
-
-    nameForm.addEventListener('submit', addUser);
   </script>
+  
 </head>
 <body>
   <section id="top">

@@ -1,3 +1,4 @@
+//httpResponses.js
 const query = require('querystring');
 
 // In-memory database
@@ -11,7 +12,7 @@ const respondJSON = (request, response, status, object) => {
   });
 
   if( request.method!= 'HEAD' ) {
-    response.write(respondJSON);
+    response.write(responseJSON);
   }
   response.end();
 };
@@ -22,7 +23,7 @@ const getUsers = (request, response) => {
     users,
   };
 
-  return respondJSON(request, response, 200, respondJSON);
+  return respondJSON(request, response, 200, responseJSON);
 };
 
 // Add users functions
@@ -55,7 +56,7 @@ const addUser = (request, response) => {
         age: bodyParams.age
     }
 
-    if(statusCode = 201) {
+    if(statusCode == 201) {
         const message = {
             message: 'User created successfully'
         }
